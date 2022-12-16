@@ -1,0 +1,24 @@
+{
+  "name": "smev3-soap",
+  "version": "1.0.0",
+  "description": "Формирование SOAP-сообщений для СМЭВ 3",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/do-/node-smev3-soap.git"
+  },
+  "keywords": [
+    "smev",
+    "смэв",
+    "soap"
+  ],
+  "author": "Dmitry Ovsyanko",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/do-/node-smev3-soap/issues"
+  },
+  "homepage": "https://github.com/do-/node-smev3-soap#readme"
+}
