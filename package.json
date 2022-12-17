@@ -22,6 +22,6 @@
   },
   "homepage": "https://github.com/do-/node-smev3-soap#readme",
   "dependencies": {
-    "xml-toolkit": "^1.0.31"
+    "xml-toolkit": "^1.0.32"
   }
 }
