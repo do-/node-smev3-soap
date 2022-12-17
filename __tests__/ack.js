@@ -10,69 +10,71 @@ const NS_SMEV_BASIC = "urn://x-artefacts-smev-gov-ru/services/message-exchange/t
 const XML_DECL = '<?xml version="1.0" encoding="UTF-8"?>'
 
 function t (id, os, ox) {
-
-	const label = JSON.stringify ([id, os, ox])
-
-	const s = new SmevSoap (os)
 	
-	const xml = s.ack (id, ox), asis = parse (xml)
+	test (JSON.stringify ([id, os, ox]), () => {
 
-	if (!os) os = {}
+		const s = new SmevSoap (os)
 
-	if (!ox) ox = {}
-	if (!('Id' in ox)) ox.Id = 'U' + id
-	if (!('accepted' in ox)) ox.accepted = true
+		const xml = s.ack (id, ox), asis = parse (xml)
 
-	const tobe = {
-	  "localName": "Envelope",
-	  "namespaceURI": NS_SOAP,
-	  "attributes": {},
-	  "children": [
-		{
-		  "localName": "Body",
+		if (!os) os = {}
+
+		if (!ox) ox = {}
+		if (!('Id' in ox)) ox.Id = 'U' + id
+		if (!('accepted' in ox)) ox.accepted = true
+
+		const tobe = {
+		  "localName": "Envelope",
 		  "namespaceURI": NS_SOAP,
 		  "attributes": {},
 		  "children": [
 			{
-			  "localName": "AckRequest",
-			  "namespaceURI": NS_SMEV,
+			  "localName": "Body",
+			  "namespaceURI": NS_SOAP,
 			  "attributes": {},
 			  "children": [
 				{
-				  "localName": "AckTargetMessage",
-				  "namespaceURI": NS_SMEV_BASIC,
-				  "attributes": {
-					"Id": ox.Id,
-					"accepted": '' + !!ox.accepted
-				  },
-				  "children": [id]
+				  "localName": "AckRequest",
+				  "namespaceURI": NS_SMEV,
+				  "attributes": {},
+				  "children": [
+					{
+					  "localName": "AckTargetMessage",
+					  "namespaceURI": NS_SMEV_BASIC,
+					  "attributes": {
+						"Id": ox.Id,
+						"accepted": '' + !!ox.accepted
+					  },
+					  "children": [id]
+					}
+				  ]
 				}
 			  ]
 			}
 		  ]
 		}
-	  ]
-	}
 
-	if ('header' in os) tobe.children.unshift ({
-		"localName": "Header",
-		"namespaceURI": NS_SOAP,
-		"attributes": {},
-		"children": [os.header].filter (s => s !== '')
+		if ('header' in os) tobe.children.unshift ({
+			"localName": "Header",
+			"namespaceURI": NS_SOAP,
+			"attributes": {},
+			"children": [os.header].filter (s => s !== '')
+		})
+
+		expect (asis).toStrictEqual (tobe)
+
+		if ('declaration' in os && os.declaration === null) {
+
+			expect (xml).toMatch (/^<\w+:Envelope\s/)
+
+		}
+		else {
+
+			expect (xml.indexOf (XML_DECL)).toBe (0)
+
+		}
+
 	})
-
-	test ('dom ' + label, () => {expect (asis).toStrictEqual (tobe)})
-	
-	if ('declaration' in os && os.declaration === null) {
-
-		test ('decl ' + label, () => {expect (xml).toMatch (/^<\w+:Envelope\s/)})
-
-	}
-	else {
-
-		test ('decl ' + label, () => {expect (xml.indexOf (XML_DECL)).toBe (0)})
-
-	}
 
 }
 

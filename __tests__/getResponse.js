@@ -10,52 +10,54 @@ const XML_DECL = '<?xml version="1.0" encoding="UTF-8"?>'
 
 function t (os, ox) {
 
-	const label = JSON.stringify ([os, ox])
-
-	const s = new SmevSoap (os)
+	test (JSON.stringify ([os, ox]), () => {
 	
-	const xml = s.getResponse (ox), asis = parse (xml)
+		const s = new SmevSoap (os)
 
-	if (!os) os = {}
+		const xml = s.getResponse (ox), asis = parse (xml)
 
-	if (!ox) ox = {}
-	if (!('Id' in ox)) ox.Id = 'U9552f341-4b2b-4cb3-b0b5-fea58fa165e1'
-	if (!('Timestamp' in ox)) ox.Timestamp = new Date ()
+		if (!os) os = {}
 
-	const ts = asis.children.find (i => i.localName === 'Body').children [0].children [0].children [0].children
+		if (!ox) ox = {}
+		if (!('Id' in ox)) ox.Id = 'U9552f341-4b2b-4cb3-b0b5-fea58fa165e1'
+		if (!('Timestamp' in ox)) ox.Timestamp = new Date ()
 
-	test ('ts ' + label, () => {expect (new Date () - new Date (ts [0])).toBeLessThan (1000)})
-	
-	ts [0] = ox.Timestamp.toJSON ()
+		const ts = asis.children.find (i => i.localName === 'Body').children [0].children [0].children [0].children
 
-	const tobe = {
-	  "localName": "Envelope",
-	  "namespaceURI": "http://schemas.xmlsoap.org/soap/envelope/",
-	  "attributes": {},
-	  "children": [
-		{
-		  "localName": "Body",
-		  "namespaceURI": "http://schemas.xmlsoap.org/soap/envelope/",
+		expect (new Date () - new Date (ts [0])).toBeLessThan (1000)
+
+		ts [0] = ox.Timestamp.toJSON ()
+
+		const tobe = {
+		  "localName": "Envelope",
+		  "namespaceURI": NS_SOAP,
 		  "attributes": {},
 		  "children": [
 			{
-			  "localName": "GetResponseRequest",
-			  "namespaceURI": "urn://x-artefacts-smev-gov-ru/services/message-exchange/types/1.1",
+			  "localName": "Body",
+			  "namespaceURI": NS_SOAP,
 			  "attributes": {},
 			  "children": [
 				{
-				  "localName": "MessageTypeSelector",
-				  "namespaceURI": "urn://x-artefacts-smev-gov-ru/services/message-exchange/types/basic/1.1",
-				  "attributes": {
-					"Id": ox.Id
-				  },
+				  "localName": "GetResponseRequest",
+				  "namespaceURI": NS_SMEV,
+				  "attributes": {},
 				  "children": [
 					{
-					  "localName": "Timestamp",
-					  "namespaceURI": "urn://x-artefacts-smev-gov-ru/services/message-exchange/types/basic/1.1",
-					  "attributes": {},
+					  "localName": "MessageTypeSelector",
+					  "namespaceURI": NS_SMEV_BASIC,
+					  "attributes": {
+						"Id": ox.Id
+					  },
 					  "children": [
-						ox.Timestamp.toJSON ()
+						{
+						  "localName": "Timestamp",
+						  "namespaceURI": NS_SMEV_BASIC,
+						  "attributes": {},
+						  "children": [
+							ox.Timestamp.toJSON ()
+						  ]
+						}
 					  ]
 					}
 				  ]
@@ -64,29 +66,29 @@ function t (os, ox) {
 			}
 		  ]
 		}
-	  ]
-	}
 
-	if ('header' in os) tobe.children.unshift ({
-		"localName": "Header",
-		"namespaceURI": NS_SOAP,
-		"attributes": {},
-		"children": [os.header].filter (s => s !== '')
+		if ('header' in os) tobe.children.unshift ({
+			"localName": "Header",
+			"namespaceURI": NS_SOAP,
+			"attributes": {},
+			"children": [os.header].filter (s => s !== '')
+		})
+
+		expect (asis).toStrictEqual (tobe)
+
+		if ('declaration' in os && os.declaration === null) {
+
+			expect (xml).toMatch (/^<\w+:Envelope\s/)
+
+		}
+		else {
+
+			expect (xml.indexOf (XML_DECL)).toBe (0)
+
+		}
+
 	})
-
-	test ('dom ' + label, () => {expect (asis).toStrictEqual (tobe)})
 	
-	if ('declaration' in os && os.declaration === null) {
-
-		test ('decl ' + label, () => {expect (xml).toMatch (/^<\w+:Envelope\s/)})
-
-	}
-	else {
-
-		test ('decl ' + label, () => {expect (xml.indexOf (XML_DECL)).toBe (0)})
-
-	}
-
 }
 
 for (const Id of [
