@@ -1,6 +1,5 @@
 const {SmevSoap}  = require ('../')
 const {XMLParser} = require ('xml-toolkit')
-const UUID = require ('uuid')
 
 const p = new XMLParser (), parse = xml => p.process (xml).detach ()
 
@@ -9,43 +8,57 @@ const NS_SMEV = "urn://x-artefacts-smev-gov-ru/services/message-exchange/types/1
 const NS_SMEV_BASIC = "urn://x-artefacts-smev-gov-ru/services/message-exchange/types/basic/1.1"
 const XML_DECL = '<?xml version="1.0" encoding="UTF-8"?>'
 
-function t (id, os, ox) {
+function t (os, ox) {
 
-	const label = JSON.stringify ([id, os, ox])
+	const label = JSON.stringify ([os, ox])
 
 	const s = new SmevSoap (os)
 	
-	const xml = s.ack (id, ox), asis = parse (xml)
+	const xml = s.getResponse (ox), asis = parse (xml)
 
 	if (!os) os = {}
 
 	if (!ox) ox = {}
-	if (!('Id' in ox)) ox.Id = 'U' + id
-	if (!('accepted' in ox)) ox.accepted = true
+	if (!('Id' in ox)) ox.Id = 'U9552f341-4b2b-4cb3-b0b5-fea58fa165e1'
+	if (!('Timestamp' in ox)) ox.Timestamp = new Date ()
+
+	const ts = asis.children.find (i => i.localName === 'Body').children [0].children [0].children [0].children
+
+	test ('ts ' + label, () => {expect (new Date () - new Date (ts [0])).toBeLessThan (1000)})
+	
+	ts [0] = ox.Timestamp.toJSON ()
 
 	const tobe = {
 	  "localName": "Envelope",
-	  "namespaceURI": NS_SOAP,
+	  "namespaceURI": "http://schemas.xmlsoap.org/soap/envelope/",
 	  "attributes": {},
 	  "children": [
 		{
 		  "localName": "Body",
-		  "namespaceURI": NS_SOAP,
+		  "namespaceURI": "http://schemas.xmlsoap.org/soap/envelope/",
 		  "attributes": {},
 		  "children": [
 			{
-			  "localName": "AckRequest",
-			  "namespaceURI": NS_SMEV,
+			  "localName": "GetResponseRequest",
+			  "namespaceURI": "urn://x-artefacts-smev-gov-ru/services/message-exchange/types/1.1",
 			  "attributes": {},
 			  "children": [
 				{
-				  "localName": "AckTargetMessage",
-				  "namespaceURI": NS_SMEV_BASIC,
+				  "localName": "MessageTypeSelector",
+				  "namespaceURI": "urn://x-artefacts-smev-gov-ru/services/message-exchange/types/basic/1.1",
 				  "attributes": {
-					"Id": ox.Id,
-					"accepted": '' + !!ox.accepted
+					"Id": ox.Id
 				  },
-				  "children": [id]
+				  "children": [
+					{
+					  "localName": "Timestamp",
+					  "namespaceURI": "urn://x-artefacts-smev-gov-ru/services/message-exchange/types/basic/1.1",
+					  "attributes": {},
+					  "children": [
+						ox.Timestamp.toJSON ()
+					  ]
+					}
+				  ]
 				}
 			  ]
 			}
@@ -81,13 +94,9 @@ for (const Id of [
 		'1'
 	]) {
 
-	for (const accepted of [
+	for (const Timestamp of [
 		undefined,
-		true, 
-		false, 
-		0, 
-		1, 
-		'zzz',
+		new Date (),
 	]) {
 	
 		for (const header of [
@@ -100,13 +109,13 @@ for (const Id of [
 			for (const k in os) if (os [k] === undefined) delete os [k]
 			let oss = [os]; if (Object.keys (os).length === 0) oss.push (undefined)
 
-			let ox = {Id, accepted}
+			let ox = {Id, Timestamp}
 			for (const k in ox) if (ox [k] === undefined) delete ox [k]
 			let oxs = [ox]; if (Object.keys (ox).length === 0) oxs.push (undefined)
 
 			for (const _os of oss) 
 				for (const _ox of oxs) 
-					t (UUID.v4 (), _os, _ox)
+					t (_os, _ox)
 		
 		}
 		
