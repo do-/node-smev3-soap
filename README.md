@@ -1,3 +1,5 @@
+![workflow](https://github.com/do-/node-smev3-soap/actions/workflows/main.yml/badge.svg)
+
 # node-smev3-soap
 
 # Disclaimer
