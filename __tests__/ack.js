@@ -32,14 +32,25 @@ const toBe = (id, ox = {}) => {
 function t (id, os, ox) {
 	
 	test (JSON.stringify ([id, os, ox]), () => {
-
-		const xml = new SmevSoap (os).ack (id, ox)
+	
+		const make = () => new SmevSoap (os).ack (id, ox)
 		
-		const domAsIs = getBody (xml, os)
+		if (id == null) {
+		
+			expect (make).toThrow ()
+		
+		}
+		else {
 
-		const domToBe = toBe (id, ox)
+			const xml = make ()
 
-		expect (domAsIs).toStrictEqual (domToBe)
+			const domAsIs = getBody (xml, os)
+
+			const domToBe = toBe (id, ox)
+
+			expect (domAsIs).toStrictEqual (domToBe)
+
+		}
 
 	})
 
@@ -70,11 +81,19 @@ for (const Id of [
 				null,
 			]) {
 
-				for (const os of orUndefined ({header, declaration}))
+				for (const os of orUndefined ({header, declaration})) {
 
-					for (const ox of orUndefined ({Id, accepted}))
-
-						t (UUID.v4 (), os, ox)
+					for (const ox of orUndefined ({Id, accepted})) {
+					
+						for (const id of [undefined, null, UUID.v4 ()]) {
+					
+							t (id, os, ox)
+							
+						}
+					
+					}
+	
+				}
 
 			}
 		
