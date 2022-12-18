@@ -6,6 +6,10 @@
   "scripts": {
     "test": "jest"
   },
+  "jest": {
+  	"verbose": false,
+  	"testPathIgnorePatterns": ["/node_modules/", "/__tests__/lib"]
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/do-/node-smev3-soap.git"
