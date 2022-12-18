@@ -7,8 +7,17 @@
     "test": "jest"
   },
   "jest": {
+  	"collectCoverage": true,
+	"collectCoverageFrom": [
+		"lib/**/*.js"
+	],
+	"coverageDirectory": "__tests__/coverage",
   	"verbose": false,
-  	"testPathIgnorePatterns": ["/node_modules/", "/__tests__/lib"]
+  	"testPathIgnorePatterns": [
+  		"/node_modules/",
+  		"/__tests__/lib",
+  		"/__tests__/coverage"
+  	]
   },
   "repository": {
     "type": "git",
