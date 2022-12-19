@@ -3,13 +3,16 @@
   "version": "1.0.0",
   "description": "Формирование SOAP-сообщений для СМЭВ 3",
   "main": "index.js",
+  "files": ["/lib"],
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "test-ci": "jest --ci --coverage"
   },
   "jest": {
 	"collectCoverageFrom": [
 		"lib/**/*.js"
 	],
+	"coverageReporters": ["clover", "json", "lcov", "text", "json-summary"],
 	"coverageDirectory": "__tests__/coverage",
   	"verbose": false,
   	"testPathIgnorePatterns": [
