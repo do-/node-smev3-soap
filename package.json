@@ -3,7 +3,7 @@
   "version": "1.0.1",
   "description": "Формирование SOAP-сообщений для СМЭВ 3",
   "main": "index.js",
-  "files": ["/lib"],
+  "files": ["/lib", "/badges"],
   "scripts": {
     "test": "jest",
     "test-ci": "jest --ci --coverage"
