@@ -1,6 +1,6 @@
 {
   "name": "smev3-soap",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Формирование SOAP-сообщений для СМЭВ 3",
   "main": "index.js",
   "files": ["/lib"],
@@ -13,7 +13,6 @@
 		"lib/**/*.js"
 	],
 	"coverageReporters": ["clover", "json", "lcov", "text", "json-summary"],
-	"coverageDirectory": "__tests__/coverage",
   	"verbose": false,
   	"testPathIgnorePatterns": [
   		"/node_modules/",
