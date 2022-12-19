@@ -1,4 +1,5 @@
 ![workflow](https://github.com/do-/node-smev3-soap/actions/workflows/main.yml/badge.svg)
+![Jest coverage](./badges/coverage-jest%20coverage.svg)
 
 # node-smev3-soap
 
